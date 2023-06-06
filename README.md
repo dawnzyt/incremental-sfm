@@ -5,11 +5,12 @@ pip install PyOpenGL
 ```
 
 ## sfm algorithm
-the flowchart of the sfm is as follows:
-![flowchart](./imgs/flowchart.png )
+the flowchart of the sfm is as follows.
+![flowchart](./imgs/flowchart.png "flowchart")
 
 ## introduction
 I have implemented the custom sfm algorithm into PyQt, run `main.py`, then you can see a simple operation interface.
+![interface](./imgs/interface.jpg "interface")
 - `open` : open a image folder, the images should be named as `1.jpg, 2.jpg, 3.jpg, ...`, and also you should provide a `K.txt` file, which contains the 3x3 camera intrinsic matrix.
 - `default` : set the default parameters.
 - `save` : save the set parameters.

@@ -159,11 +159,13 @@ class MainUi(QMainWindow, Ui_MainWindow):
         # self.setWindowIcon(QIcon('D:\JetBrains\Toolbox\PacharmProject\sfm-gui\imgs\Icon.ico'))
         # 不同objectName的控件设置不同的样式, 用于区分
         self.para_hint_btn.setObjectName('label_btn')
+        self.operator_hint_btn.setObjectName('label_btn')
         self.match_factor_hint_btn.setObjectName('label_btn')
         self.ransac_t_hint_btn.setObjectName('label_btn')
         self.downscale_factor_hint_btn.setObjectName('label_btn')
         self.match_title_btn.setObjectName('label_btn')
         self.points_title_btn.setObjectName('label_btn')
+
 
         # 可操作的btn
         self.open_btn.setObjectName('btn')
@@ -213,6 +215,7 @@ class MainUi(QMainWindow, Ui_MainWindow):
         self.match_title_btn.setIcon(qtawesome.icon('fa.image', color='red'))
         self.points_title_btn.setIcon(qtawesome.icon('fa.cubes', color='red'))
         self.para_hint_btn.setIcon(qtawesome.icon('msc.settings-gear', color='red'))
+        self.operator_hint_btn.setIcon(qtawesome.icon('fa5s.tools', color='red'))
         self.match_factor_hint_btn.setIcon(qtawesome.icon('fa.question-circle', color='red'))
         self.ransac_t_hint_btn.setIcon(qtawesome.icon('fa.question-circle', color='red'))
         self.downscale_factor_hint_btn.setIcon(qtawesome.icon('fa.question-circle', color='red'))

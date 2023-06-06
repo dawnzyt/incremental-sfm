@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1285</width>
-    <height>699</height>
+    <height>705</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -75,7 +75,7 @@
      <string>open</string>
     </property>
    </widget>
-   <widget class="QGroupBox" name="groupBox">
+   <widget class="QGroupBox" name="parm_groupBox">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -186,7 +186,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>370</y>
+       <y>350</y>
        <width>71</width>
        <height>28</height>
       </rect>
@@ -199,7 +199,7 @@
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>370</y>
+       <y>350</y>
        <width>71</width>
        <height>28</height>
       </rect>
@@ -226,51 +226,12 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>490</y>
+      <y>500</y>
       <width>1071</width>
       <height>151</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="log_layout"/>
-   </widget>
-   <widget class="QPushButton" name="step_btn">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>490</y>
-      <width>71</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>step</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="run_btn">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>490</y>
-      <width>71</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>run</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="save_ply_btn">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>570</y>
-      <width>111</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>save ply</string>
-    </property>
    </widget>
    <widget class="QPushButton" name="para_hint_btn">
     <property name="geometry">
@@ -283,19 +244,6 @@
     </property>
     <property name="text">
      <string>para set</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="stop_btn">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>530</y>
-      <width>111</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>stop</string>
     </property>
    </widget>
    <widget class="QPushButton" name="watermark_btn">
@@ -317,6 +265,84 @@ color:qradialgradient(spread:repeat, cx:0.5, cy:0.5, radius:0.077, fx:0.5, fy:0.
     </property>
     <property name="text">
      <string>dawnzyt</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="operator_groupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>500</y>
+      <width>171</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <widget class="QPushButton" name="step_btn">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>71</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>step</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="run_btn">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>10</y>
+       <width>71</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>run</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="stop_btn">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>50</y>
+       <width>111</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>stop</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="save_ply_btn">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>90</y>
+       <width>111</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>save ply</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QPushButton" name="operator_hint_btn">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>480</y>
+      <width>93</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>operator</string>
     </property>
    </widget>
   </widget>
