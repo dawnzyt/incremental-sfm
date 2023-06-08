@@ -50,11 +50,8 @@ class RunWorker(QThread, QObject):
             self.sinStepEnd.emit()
         self.obj.is_running = False
 
-
+# logging的处理器,多添加一个QPlainTextEdit,以记录日志传来时同步更新QPlainTextEdit以display。
 class QPlainTextEditLogger(logging.Handler):
-    '''
-    logging的处理器,多添加一个QPlainTextEdit,以记录日志传来时同步更新QPlainTextEdit以display。
-    '''
 
     def __init__(self, parent):  # 这里的parent其实就是主窗口mainwindow
         super().__init__()
@@ -77,7 +74,7 @@ class QPlainTextEditLogger(logging.Handler):
         msg = self.format(record)
         self.widget.appendPlainText(msg)
 
-
+# sfm-gui主窗口
 class MainUi(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
@@ -165,7 +162,6 @@ class MainUi(QMainWindow, Ui_MainWindow):
         self.downscale_factor_hint_btn.setObjectName('label_btn')
         self.match_title_btn.setObjectName('label_btn')
         self.points_title_btn.setObjectName('label_btn')
-
 
         # 可操作的btn
         self.open_btn.setObjectName('btn')
@@ -294,7 +290,9 @@ class MainUi(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def open_btn_clicked(self):
-        self.img_path = QFileDialog.getExistingDirectory(self, '选择数据集(注意:目录下包含.png/.jpg格式的图像集和内参K.txt)', r'./')
+        self.img_path = QFileDialog.getExistingDirectory(self,
+                                                         '选择数据集(注意:目录下包含.png/.jpg格式的图像集和内参K.txt)',
+                                                         r'./')
         if not self.img_path:
             return
         # 清空log text
@@ -357,11 +355,9 @@ class MainUi(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def save_ply_btn_clicked(self):
-        # 保存点云
+        # 保存点云为ply格式
         path = QFileDialog.getSaveFileName(self, '保存点云', './', '*.ply')
         if not path[0]:
-            logging.warning('path is None')
-            QMessageBox.warning(self, '警告', '请先设置path')
             return
         self.model.save(path[0])
         logging.info('save point cloud success')

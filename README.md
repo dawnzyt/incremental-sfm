@@ -21,3 +21,5 @@ I have implemented the custom sfm algorithm into PyQt, run `main.py`, then you c
 While running the sfm algorithm, you can use the mouse to rotate the 3d points and camera poses.
 About the details of the algorithm, you can refer to the `./doc/report.pdf` file.
 
+## attention
+I will keep updating this project, if you have any questions, please contact me by email: `ziyu@bupt.edu.cn`.

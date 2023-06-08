@@ -1,12 +1,11 @@
 """
-增量法SFM, 核心步骤在于如何寻找下一个图像匹配对（SLAM常为顺序列）以及PnP计算位姿、BA优化三维点和所有相机的位姿。
+增量法SFM, 核心步骤在于视图对寻找（SLAM常为顺序列）、特征点匹配、本质矩阵计算、几何一致性检测、本质矩阵分解、PnP计算位姿、点云融合、BA捆绑调整等。
 世界坐标默认为视图1的相机坐标。
-由于基础矩阵分解时尺度是齐次的，因此所有视图的尺度与初始视图0、视图1分解E的平移向量t的尺度一致。尺度可以看作该平移向量的模长。
-sfm主函数基本步骤：
+由于基础矩阵分解时尺度是齐次的，因此所有视图的尺度与初始视图0、视图1分解E的平移向量t的尺度一致。这也间接说明了我们重建得到的是一个相对三维空间位置。
+sfm基本步骤：
 1. 将所有图像downscale并提取所有图像的sift 特征，得到特征点和描述子。
-2. 计算视图0和视图1的本质矩阵，分解得到T和R并重建为初始化点云，视图0的相机坐标系为世界坐标系；
-3. 不断增加视图0,1,2,...i,i+1.. 视图i+1与视图i进行匹配，选择i-1和i匹配与i和i+1视图匹配的公共已重建三维点,
-使用PnP方法计算视图i+1的位姿，然后fusion新增点云；
+2. 初始化sfm：计算视图0和某一视图的本质矩阵，一致性检测去除噪点，分解得到T和R并重建为初始化点云，视图0的相机坐标系为世界坐标系；
+3. 不断增加视图0,1,2,...i,i+1.. 视图i+1与视图i进行匹配，选择i-1和i匹配与i和i+1视图匹配的公共已重建三维点计算PnP视图i+1的位姿，然后fusion新增点云；
 4. 每一步骤都要进行bundle adjustment。
 """
 import collections
@@ -25,6 +24,13 @@ from tqdm.contrib.logging import logging_redirect_tqdm
 
 class IncrementalSFM:
     def __init__(self, imgs_dir: str, downscale_factor: float = 1.0, log_handler=None):
+        """
+        初始化整个sfm的相关参数、中间变量，并读取图像，进行下采样处理。
+
+        :param imgs_dir:
+        :param downscale_factor:
+        :param log_handler:
+        """
         # set log handler, 用于将log输出到文件
         self.log_handler = None
         if log_handler is not None:
@@ -33,9 +39,9 @@ class IncrementalSFM:
         # read images
         img_names = os.listdir(imgs_dir)
         self.imgs_dir = imgs_dir
-        self.downscale_factor = downscale_factor
-        self.img_list = []
-        self.img_name_list = []
+        self.downscale_factor = downscale_factor # downscale以加快重建速度
+        self.img_list = [] # 存储所有图像
+        self.img_name_list = [] # 存储所有图像的名称
         for name in img_names:
             if name[-4:] == '.txt':
                 self.K = np.loadtxt(imgs_dir + '/' + name, dtype=str).astype(float)
@@ -52,10 +58,10 @@ class IncrementalSFM:
         # 待重建的位姿和Points
         self.R0 = np.array([[1.0, 0, 0], [0, 1.0, 0], [0, 0, 1.0]])  # 视图0的位姿
         self.T0 = np.zeros((3, 1), dtype=float)
-        self.Rs = []
-        self.Ts = []
-        self.Points = np.zeros((1, 3), dtype=float)
-        self.Colors = np.zeros((1, 3), dtype=np.uint8)
+        self.Rs = [] # 重建的位姿R
+        self.Ts = [] # 重建的位姿T
+        self.Points = np.zeros((1, 3), dtype=float) # 重建的三维点
+        self.Colors = np.zeros((1, 3), dtype=np.uint8) # 重建的三维点color
         # (p,u,v)三维点由第p个视图重建得到,像素坐标为(u,v)。方便计算重投影误差或者快速索引进行局部/全局的BA优化
         self.pts_info = np.zeros((1, 3), dtype=float)
 
@@ -192,11 +198,12 @@ class IncrementalSFM:
             logging.info("initial sfm with view %s and %s, Reprojection Err: %.3f, " % (
                 self.img_name_list[0], self.img_name_list[self.order[0]], err))
         if if_local_BA:
+            ti=time.time()
             P_w, R, T = self.local_bundle_adjustment(P_pix2, P_w, self.K, R, T)
             err = utils.utils.reprojection_err(self.K, P_pix2, P_w, R, T)
-            print("BA Reprojection Err: %.3f, " % (err), end='')
+            print("BA Reprojection Err: %.3f, cost time: %.3fs" % (err,time.time()-ti), end='')
             if self.log_handler:
-                logging.info("BA Reprojection Err: %.3f, " % (err))
+                logging.info("BA Reprojection Err: %.3f, cost time: %.3fs" % (err,time.time()-ti))
         print('')
         # update Points and Colors and pts_info
         self.Points = np.vstack([self.Points, P_w])
@@ -290,7 +297,7 @@ class IncrementalSFM:
             return x.ravel() - reproj_x.ravel()
 
         variables = np.hstack([R.ravel(), T.ravel(), X.ravel()])
-        BA_vars = least_squares(func, variables, args=(K, x), method='lm').x
+        BA_vars = least_squares(func, variables, args=(K, x)).x
         R = BA_vars[:9].reshape(3, 3)
         T = BA_vars[9:12].reshape(3, 1)
         X = BA_vars[12:].reshape(-1, 3)
@@ -415,13 +422,14 @@ class IncrementalSFM:
                 self.img_name_list[self.order[-1]], len(Points), err))
         # BA视图的位姿、三维点
         if if_local_BA:
+            ti= time.time()
             Points, R, T = self.local_bundle_adjustment(P_pix2, Points, self.K, R, T)
             self.Points[-len(Points):], self.Rs[-1], self.Ts[-1] = Points, R, T
             # 计算BA后的重投影误差
             err = utils.utils.reprojection_err(self.K, P_pix2, Points, R, T)
-            print("BA Reprojection err:%3f" % (err), end='')
+            print("BA Reprojection err:%3f, cost time: %.3fs" % (err,time.time()-ti), end='')
             if self.log_handler:
-                logging.info("BA Reprojection err:%3f" % (err))
+                logging.info("BA Reprojection err:%3f, cost time: %.3fs" % (err,time.time()-ti))
         print('')
         self.new_points = self.Points[-len(Points):]
         # print("fussion img {} cost time {}s".format(self.order[-1], time.time() - ti))
@@ -455,8 +463,6 @@ class IncrementalSFM:
             logging.info("before select: {} points, select {} inlier points".format(len(self.Points), np.sum(keep_idx)))
         self.Points, self.Colors, self.pts_info = self.Points[keep_idx], self.Colors[keep_idx], self.pts_info[keep_idx]
 
-    # sfm的每个step, 遵循state状态顺序
-    # pro
     def step(self, if_local_BA=False, if_global_BA=False, if_select=True, match_factor=0.7, threshold=0.4):
         """
         sfm的过程被我抽象成一个状态机, 每个step就是一个状态, 每个状态都有对应的任务目标
