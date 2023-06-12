@@ -18,8 +18,18 @@ I have implemented the custom sfm algorithm into PyQt, run `main.py`, then you c
 - `run` : run the sfm algorithm automatically.
 - `stop` : stop the running sfm algorithm.
 - `save plt` : save the reconstructed 3d points and camera poses(not implemented yet) as a `.plt` file.
+
 While running the sfm algorithm, you can use the mouse to rotate the 3d points and camera poses.
+
 About the details of the algorithm, you can refer to the `./doc/report.pdf` file.
 
 ## attention
 I will keep updating this project, if you have any questions, please contact me by email: `ziyu@bupt.edu.cn`.
+
+## excutable file
+
+I have compiled the project into an excutable file with `pyinstaller`.
+
+And I only test it on Windows 10,so I can't guarantee that it can run on linux or mac.You should compile the `main.py` file by yourself.
+
+You can download the `exe` file from [here](https://pan.baidu.com/s/1AbfFvwxdWPxspViHwg7raA), the extraction code is `6666`.
